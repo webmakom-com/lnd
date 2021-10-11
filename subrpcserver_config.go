@@ -15,6 +15,7 @@ import (
 	"github.com/lightningnetwork/lnd/lnrpc/autopilotrpc"
 	"github.com/lightningnetwork/lnd/lnrpc/chainrpc"
 	"github.com/lightningnetwork/lnd/lnrpc/invoicesrpc"
+	"github.com/lightningnetwork/lnd/lnrpc/peersrpc"
 	"github.com/lightningnetwork/lnd/lnrpc/routerrpc"
 	"github.com/lightningnetwork/lnd/lnrpc/signrpc"
 	"github.com/lightningnetwork/lnd/lnrpc/walletrpc"
@@ -58,6 +59,10 @@ type subRPCServerConfigs struct {
 	// InvoicesRPC is a sub-RPC server that exposes invoice related methods
 	// as a gRPC service.
 	InvoicesRPC *invoicesrpc.Config `group:"invoicesrpc" namespace:"invoicesrpc"`
+
+	// PeersRPC is a sub-RPC server that exposes peer related methods
+	// as a gRPC service.
+	PeersRPC *peersrpc.Config `group:"peersrpc" namespace:"peersrpc"`
 
 	// RouterRPC is a sub-RPC server the exposes functionality that allows
 	// clients to send payments on the network, and perform Lightning
@@ -269,6 +274,7 @@ func (s *subRPCServerConfigs) PopulateDependencies(cfg *Config,
 			subCfgValue.FieldByName("Log").Set(
 				reflect.ValueOf(rpcLogger),
 			)
+		case *peersrpc.Config:
 
 		default:
 			return fmt.Errorf("unknown field: %v, %T", fieldName,

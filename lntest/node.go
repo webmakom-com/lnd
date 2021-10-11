@@ -31,6 +31,7 @@ import (
 	"github.com/lightningnetwork/lnd/chanbackup"
 	"github.com/lightningnetwork/lnd/lnrpc"
 	"github.com/lightningnetwork/lnd/lnrpc/invoicesrpc"
+	"github.com/lightningnetwork/lnd/lnrpc/peersrpc"
 	"github.com/lightningnetwork/lnd/lnrpc/routerrpc"
 	"github.com/lightningnetwork/lnd/lnrpc/signrpc"
 	"github.com/lightningnetwork/lnd/lnrpc/walletrpc"
@@ -417,6 +418,8 @@ type HarnessNode struct {
 	lnrpc.WalletUnlockerClient
 
 	invoicesrpc.InvoicesClient
+
+	peersrpc.PeersClient
 
 	// SignerClient cannot be embedded because the name collisions of the
 	// methods SignMessage and VerifyMessage.
