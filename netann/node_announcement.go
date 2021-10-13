@@ -35,6 +35,14 @@ func NodeAnnSetTimestamp(nodeAnn *lnwire.NodeAnnouncement) {
 	nodeAnn.Timestamp = newTimestamp
 }
 
+// NodeAnnSetColor is a functional option that sets the alias of the
+// given node announcment
+func NodeAnnSetAlias(alias lnwire.NodeAlias) func(*lnwire.NodeAnnouncement) {
+	return func(nodeAnn *lnwire.NodeAnnouncement) {
+		nodeAnn.Alias = alias
+	}
+}
+
 // SignNodeAnnouncement applies the given modifies to the passed
 // lnwire.NodeAnnouncement, then signs the resulting announcement. The provided
 // update should be the most recent, valid update, otherwise the timestamp may

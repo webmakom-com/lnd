@@ -4,14 +4,177 @@
     "title": "peersrpc/peers.proto",
     "version": "version not set"
   },
+  "tags": [
+    {
+      "name": "Peers"
+    }
+  ],
   "consumes": [
     "application/json"
   ],
   "produces": [
     "application/json"
   ],
-  "paths": {},
+  "paths": {
+    "/v2/router/send": {
+      "post": {
+        "summary": "lncli: `updatenodeannouncement`\nUpdateNodeAnnouncement allows the caller to update the node parameters\nand broadcasts a new version of the node announcement to its peers.",
+        "operationId": "Peers_UpdateNodeAnnouncement",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/peersrpcNodeAnnouncementUpdateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/peersrpcNodeAnnouncementUpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Peers"
+        ]
+      }
+    }
+  },
   "definitions": {
+    "lnrpcFeatureBit": {
+      "type": "string",
+      "enum": [
+        "DATALOSS_PROTECT_REQ",
+        "DATALOSS_PROTECT_OPT",
+        "INITIAL_ROUING_SYNC",
+        "UPFRONT_SHUTDOWN_SCRIPT_REQ",
+        "UPFRONT_SHUTDOWN_SCRIPT_OPT",
+        "GOSSIP_QUERIES_REQ",
+        "GOSSIP_QUERIES_OPT",
+        "TLV_ONION_REQ",
+        "TLV_ONION_OPT",
+        "EXT_GOSSIP_QUERIES_REQ",
+        "EXT_GOSSIP_QUERIES_OPT",
+        "STATIC_REMOTE_KEY_REQ",
+        "STATIC_REMOTE_KEY_OPT",
+        "PAYMENT_ADDR_REQ",
+        "PAYMENT_ADDR_OPT",
+        "MPP_REQ",
+        "MPP_OPT",
+        "WUMBO_CHANNELS_REQ",
+        "WUMBO_CHANNELS_OPT",
+        "ANCHORS_REQ",
+        "ANCHORS_OPT",
+        "ANCHORS_ZERO_FEE_HTLC_REQ",
+        "ANCHORS_ZERO_FEE_HTLC_OPT",
+        "AMP_REQ",
+        "AMP_OPT"
+      ],
+      "default": "DATALOSS_PROTECT_REQ"
+    },
+    "lnrpcNodeAddress": {
+      "type": "object",
+      "properties": {
+        "network": {
+          "type": "string"
+        },
+        "addr": {
+          "type": "string"
+        }
+      }
+    },
+    "lnrpcOp": {
+      "type": "object",
+      "properties": {
+        "entity": {
+          "type": "string"
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "peersrpcNodeAnnouncementUpdateRequest": {
+      "type": "object",
+      "properties": {
+        "featureUpdates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/peersrpcUpdateFeatureAction"
+          },
+          "description": "FeatureUpdates holds the set of features the node supports."
+        },
+        "color": {
+          "type": "string",
+          "description": "Color is the node's color in hex code format."
+        },
+        "alias": {
+          "type": "string",
+          "description": "Alias is the alias or nick name of the node."
+        },
+        "addressUpdates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/peersrpcUpdateAddressAction"
+          },
+          "description": "AddressUpdates is a slice of all the node's known addresses."
+        }
+      }
+    },
+    "peersrpcNodeAnnouncementUpdateResponse": {
+      "type": "object",
+      "properties": {
+        "ops": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/lnrpcOp"
+          }
+        }
+      }
+    },
+    "peersrpcUpdateAction": {
+      "type": "string",
+      "enum": [
+        "ADD",
+        "REMOVE"
+      ],
+      "default": "ADD"
+    },
+    "peersrpcUpdateAddressAction": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "$ref": "#/definitions/peersrpcUpdateAction"
+        },
+        "address": {
+          "$ref": "#/definitions/lnrpcNodeAddress"
+        }
+      }
+    },
+    "peersrpcUpdateFeatureAction": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "$ref": "#/definitions/peersrpcUpdateAction"
+        },
+        "featureBit": {
+          "$ref": "#/definitions/lnrpcFeatureBit"
+        }
+      }
+    },
     "protobufAny": {
       "type": "object",
       "properties": {

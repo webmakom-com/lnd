@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "lightning.proto";
+
 package peersrpc;
 
 option go_package = "github.com/lightningnetwork/lnd/lnrpc/peersrpc";
@@ -7,4 +9,62 @@ option go_package = "github.com/lightningnetwork/lnd/lnrpc/peersrpc";
 // Peers is a service that can be used to get information and interact
 // with the other nodes of the newtwork.
 service Peers {
+    /* lncli: `updatenodeannouncement`
+    UpdateNodeAnnouncement allows the caller to update the node parameters
+    and broadcasts a new version of the node announcement to its peers.
+    */
+    rpc UpdateNodeAnnouncement (NodeAnnouncementUpdateRequest)
+        returns (NodeAnnouncementUpdateResponse);
+}
+
+enum UpdateAction {
+    ADD = 0;
+    REMOVE = 1;
+}
+
+message UpdateAddressAction {
+    UpdateAction action = 1;
+    lnrpc.NodeAddress address = 2;
+}
+
+message UpdateFeatureAction {
+    UpdateAction action = 1;
+    lnrpc.FeatureBit featureBit = 2;
+
+}
+
+message NodeAnnouncementUpdateRequest {
+    // FeatureUpdates holds the set of features the node supports.
+    repeated UpdateFeatureAction featureUpdates = 1;
+
+    // Color is the node's color in hex code format.
+    string color = 2;
+
+    // Alias is the alias or nick name of the node.
+    string alias = 3;
+
+    // AddressUpdates is a slice of all the node's known addresses.
+    repeated UpdateAddressAction addressUpdates = 4;
+}
+
+message NodeAnnouncementUpdateResponse {
+    repeated lnrpc.Op ops = 1;
+}
+
+message NodeAnnouncementUpdateRequest {
+    // FeatureUpdates holds the set of features the node supports.
+    repeated UpdateFeatureAction featureUpdates = 1;
+
+    // Color is the node's color in hex code format.
+    string color = 2;
+
+    // Alias is the alias or nick name of the node.
+    string alias = 3;
+
+    // AddressUpdates is a slice of all the node's known addresses.
+    repeated UpdateAddressAction addressUpdates = 4;
+}
+
+message NodeAnnouncementUpdateResponse {
+    repeated lnrpc.Op ops = 1;
 }

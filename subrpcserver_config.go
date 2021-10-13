@@ -11,6 +11,7 @@ import (
 	"github.com/lightningnetwork/lnd/channeldb"
 	"github.com/lightningnetwork/lnd/htlcswitch"
 	"github.com/lightningnetwork/lnd/invoices"
+	"github.com/lightningnetwork/lnd/keychain"
 	"github.com/lightningnetwork/lnd/lncfg"
 	"github.com/lightningnetwork/lnd/lnrpc/autopilotrpc"
 	"github.com/lightningnetwork/lnd/lnrpc/chainrpc"
@@ -25,6 +26,7 @@ import (
 	"github.com/lightningnetwork/lnd/macaroons"
 	"github.com/lightningnetwork/lnd/netann"
 	"github.com/lightningnetwork/lnd/routing"
+	"github.com/lightningnetwork/lnd/routing/route"
 	"github.com/lightningnetwork/lnd/sweep"
 	"github.com/lightningnetwork/lnd/watchtower"
 	"github.com/lightningnetwork/lnd/watchtower/wtclient"
@@ -103,9 +105,14 @@ func (s *subRPCServerConfigs) PopulateDependencies(cfg *Config,
 	tower *watchtower.Standalone,
 	towerClient wtclient.Client,
 	anchorTowerClient wtclient.Client,
+	identityECDH keychain.SingleKeyECDH,
 	tcpResolver lncfg.TCPResolver,
 	genInvoiceFeatures func() *lnwire.FeatureVector,
 	genAmpInvoiceFeatures func() *lnwire.FeatureVector,
+	genNodeAnnouncement func(bool,
+		...netann.NodeAnnModifier) (lnwire.NodeAnnouncement, error),
+	broadcastMessage func(skips map[route.Vertex]struct{},
+		msgs ...lnwire.Message) error,
 	rpcLogger btclog.Logger) error {
 
 	// First, we'll use reflect to obtain a version of the config struct
@@ -274,7 +281,31 @@ func (s *subRPCServerConfigs) PopulateDependencies(cfg *Config,
 			subCfgValue.FieldByName("Log").Set(
 				reflect.ValueOf(rpcLogger),
 			)
+
 		case *peersrpc.Config:
+			subCfgValue := extractReflectValue(subCfg)
+
+			subCfgValue.FieldByName("Broadcast").Set(
+				reflect.ValueOf(broadcastMessage),
+			)
+			subCfgValue.FieldByName("GenNodeAnnouncement").Set(
+				reflect.ValueOf(genNodeAnnouncement),
+			)
+			subCfgValue.FieldByName("GraphDB").Set(
+				reflect.ValueOf(graphDB),
+			)
+			subCfgValue.FieldByName("NetworkDir").Set(
+				reflect.ValueOf(networkDir),
+			)
+			subCfgValue.FieldByName("MacService").Set(
+				reflect.ValueOf(macService),
+			)
+			subCfgValue.FieldByName("PubKey").Set(
+				reflect.ValueOf(
+					identityECDH.PubKey().
+						SerializeCompressed(),
+				),
+			)
 
 		default:
 			return fmt.Errorf("unknown field: %v, %T", fieldName,

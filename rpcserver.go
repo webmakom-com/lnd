@@ -733,8 +733,9 @@ func (r *rpcServer) addDeps(s *server, macService *macaroons.Service,
 		s.htlcSwitch, r.cfg.ActiveNetParams.Params, s.chanRouter,
 		routerBackend, s.nodeSigner, s.graphDB, s.chanStateDB,
 		s.sweeper, tower, s.towerClient, s.anchorTowerClient,
-		r.cfg.net.ResolveTCPAddr, genInvoiceFeatures,
-		genAmpInvoiceFeatures, rpcsLog,
+		s.identityECDH, r.cfg.net.ResolveTCPAddr, genInvoiceFeatures,
+		genAmpInvoiceFeatures, s.genNodeAnnouncement, s.BroadcastMessage,
+		rpcsLog,
 	)
 	if err != nil {
 		return err
